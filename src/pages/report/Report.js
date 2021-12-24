@@ -8,14 +8,17 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { ColorButtonCyan, StyledTableCell } from "../approval/ApprovalStyle";
 import { CSVLink } from "react-csv";
+import ReactPaginate from "react-paginate"
+import "./paginate.css";
 
 const Report = () => {
   const headers = [
     { label: "Branch", key: "branch" },
+    { label: "Semester", key: "semester" },
     { label: "Name", key: "name" },
     { label: "Email", key: "email" },
     { label: "TimeStamp", key: "time" },
-    { label: "Image", key: "image" },
+    { label: "Image", key: "image" }
   ];
 
   var date;
@@ -35,6 +38,13 @@ const Report = () => {
   //   },
   // ];
 
+  //Pagination
+  const [pageNumber, setPageNumber] = useState(0);
+  const usersPerPage = 2;
+  const pagesVisited = pageNumber * usersPerPage;
+  
+
+    
   useEffect(() => {
     onSnapshot(query(collection(db, "hostel8/users/clients")), (snapshot) =>
       setUsers(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
@@ -88,6 +98,26 @@ const Report = () => {
     );
   };
 
+  const displayStoredPresentStudents = () => {
+    return storePresentStudents.slice(pagesVisited, pagesVisited + usersPerPage).map((user)=>{
+      return (
+        <TableRow>
+        <StyledTableCell><img src={user.image} height="100px" width="100px" alt="studentImage"></img></StyledTableCell>
+        <StyledTableCell>{user.branch}</StyledTableCell>
+        <StyledTableCell>{user.semester}</StyledTableCell>
+        <StyledTableCell>{user.name}</StyledTableCell>
+        <StyledTableCell>{user.email}</StyledTableCell>
+        <StyledTableCell>{user.time}</StyledTableCell>
+        </TableRow>
+      );
+    })
+  }
+
+  const pageCount = Math.ceil(presentStudents.length/usersPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+  
   return (
     <div>
       <h3>Attendance Reports</h3>
@@ -130,8 +160,9 @@ const Report = () => {
             <Table stickyHeader="true" size="small">
               <TableHead variant="head">
                 <TableRow>
-                  <StyledTableCell>Image</StyledTableCell>
+                <StyledTableCell>Image</StyledTableCell>
                   <StyledTableCell>Branch</StyledTableCell>
+                  <StyledTableCell>Semester</StyledTableCell>
                   <StyledTableCell>Name</StyledTableCell>
                   <StyledTableCell>Email</StyledTableCell>
                   <StyledTableCell>TimeStamp</StyledTableCell>
@@ -146,39 +177,41 @@ const Report = () => {
                     time: tConv24(record.timeStamp),
                     image: record.imageUrl,
                     branch: "",
+                    semester: ""
                   };
 
                   for (var i = 0; i < users.length; i++) {
                     const user = users[i];
                     if (user.email === record.email) {
                       newUser.branch = user.branch;
-                      // break;
+                      newUser.semester = user.semester;
+                      break;
                     }
                   }
 
                   storePresentStudents.push(newUser);
                 })}
 
-                {storePresentStudents.map((user) => {
-                  return (
-                    <TableRow>
-                      <StyledTableCell>
-                        <img
-                          src={user.image}
-                          height="90px"
-                          width="90px"
-                          alt="not availabe"
-                        ></img>
-                      </StyledTableCell>
-                      <StyledTableCell>{user.branch}</StyledTableCell>
-                      <StyledTableCell>{user.name}</StyledTableCell>
-                      <StyledTableCell>{user.email}</StyledTableCell>
-                      <StyledTableCell>{user.time}</StyledTableCell>
-                    </TableRow>
-                  );
-                })}
+               {/* Present Students */
+               displayStoredPresentStudents()
+               }
+               
               </TableBody>
+
             </Table>
+            <div className="react-paginate" align="center">
+              <ReactPaginate
+                previousLabel={"Previous"}
+                nextLabel={"Next"}
+                onPageChange={changePage}
+                pageCount={pageCount}
+                containerClassName={"paginationBttns"}
+                previousLinkClassName={"previousBttn"}
+                nextLinkClassName={"nextBttn"}
+                disabledClassName={"paginationDisabled"}
+                activeClassName={"paginationActive"}
+              />
+            </div>
             <div align="center">
               <ColorButtonCyan variant="contained" className="mt-2">
                 <CSVLink
@@ -195,14 +228,15 @@ const Report = () => {
               {/*Function for absent students */}
               {}
               {/* Table for Absent Students */}
-              <Table size="small">
+              <Table>
                 <TableHead variant="head">
                   <TableRow>
-                    <StyledTableCell>Image</StyledTableCell>
-                    <StyledTableCell>Branch</StyledTableCell>
-                    <StyledTableCell>Name</StyledTableCell>
-                    <StyledTableCell>Email</StyledTableCell>
-                    <StyledTableCell>TimeStamp</StyledTableCell>
+                  <StyledTableCell>Image</StyledTableCell>
+                  <StyledTableCell>Branch</StyledTableCell>
+                  <StyledTableCell>Semester</StyledTableCell>
+                  <StyledTableCell>Name</StyledTableCell>
+                  <StyledTableCell>Email</StyledTableCell>
+                  <StyledTableCell>TimeStamp</StyledTableCell>
                   </TableRow>
                 </TableHead>
               </Table>
@@ -212,7 +246,7 @@ const Report = () => {
       ) : (
         <h5>
           <br />
-          Not Found! Check the selected date.
+          Attendance not available in database
         </h5>
       )}
     </div>
