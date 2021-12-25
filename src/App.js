@@ -38,14 +38,16 @@ const App = () => {
     clearErrors();
     const adminCheck = await getDocs(collection(db, "hostel8/users/admins"));
     adminCheck.forEach((doc) => {
-        if (loginEmail === doc.id) {
-          try {
-            signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-          } catch (e) {
-            setError(e.code)
-          }     
-      } else{
-        setError("Invalid authentication details!")
+
+      try {
+        if(loginEmail === doc.id) {
+          signInWithEmailAndPassword(auth, loginEmail, loginPassword).catch((error) => 
+          setError(error.code.substring(5) + "!"))
+        } else {
+          setError("Invalid Details!")
+        }
+      }catch (e){
+         setError(e.message)
       }
     });
   };

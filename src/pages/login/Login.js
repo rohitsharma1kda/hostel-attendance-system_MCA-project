@@ -19,28 +19,33 @@ const Login = (props) => {
         <div className="form-group">
           <label htmlFor="email">E-mail</label>
           <input
+            required
             placeholder="mail@mail.com"
             type="text"
             name="email"
             id="email"
             value={loginEmail}
             onChange={(e) => setLoginEmail(e.target.value)}
-            required
           />
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
+            required
             placeholder="********"
             type="password"
             name="password"
             id="password"
             value={loginPassword}
             onChange={(e) => setLoginPassword(e.target.value)}
-            required
           />
         </div>
-        <p style={{marginTop: "13px", textAlign: "left"}} className="errorMsg">{error}</p>
+        <p
+          style={{ marginTop: "13px", textAlign: "left" }}
+          className="errorMsg"
+        >
+          {error}
+        </p>
         <div className="btnholder">
           <button onClick={handleLogin}>LOGIN </button>
         </div>
