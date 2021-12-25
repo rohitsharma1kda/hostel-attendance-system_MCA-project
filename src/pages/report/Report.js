@@ -228,7 +228,7 @@ const Report = () => {
               {/*Function for absent students */}
               {}
               {/* Table for Absent Students */}
-              <Table>
+              <Table size="small">
                 <TableHead variant="head">
                   <TableRow>
                   <StyledTableCell>Image</StyledTableCell>

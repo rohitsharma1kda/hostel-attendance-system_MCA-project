@@ -50,11 +50,11 @@ function Btech() {
         return (
           <>
             <StyledTableRow key={user.id}>
-              <StyledTableCell>{user.course}</StyledTableCell>
-              <StyledTableCell>{user.branch}</StyledTableCell>
-              <StyledTableCell>{user.roll}</StyledTableCell>
               <StyledTableCell>{user.name}</StyledTableCell>
               <StyledTableCell>{user.email}</StyledTableCell>
+              <StyledTableCell>{user.branch}</StyledTableCell>
+              <StyledTableCell>{user.roll}</StyledTableCell>
+              <StyledTableCell>{user.phone}</StyledTableCell>
             </StyledTableRow>
           </>
         );
@@ -100,11 +100,11 @@ function Btech() {
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Branch</StyledTableCell>
-              <StyledTableCell>Department</StyledTableCell>
-              <StyledTableCell>Roll Number</StyledTableCell>
               <StyledTableCell>Name</StyledTableCell>
               <StyledTableCell>Email</StyledTableCell>
+              <StyledTableCell>Branch</StyledTableCell>
+              <StyledTableCell>Roll No</StyledTableCell>
+              <StyledTableCell>Phone</StyledTableCell>
             </TableRow>
           </TableHead>
 
