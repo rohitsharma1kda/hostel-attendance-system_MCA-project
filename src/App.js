@@ -43,8 +43,6 @@ const App = () => {
         if(loginEmail === doc.id) {
           signInWithEmailAndPassword(auth, loginEmail, loginPassword).catch((error) => 
           setError(error.code.substring(5) + "!"))
-        } else {
-          setError("Invalid Details!")
         }
       }catch (e){
          setError(e.message)
