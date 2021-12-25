@@ -41,10 +41,11 @@ const App = () => {
         if (loginEmail === doc.id) {
           try {
             signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-          } catch (error) {
-            setError(error.code)
-            // setError(error.code.substring(5))
+          } catch (e) {
+            setError(e.code)
           }     
+      } else{
+        setError("Invalid authentication details!")
       }
     });
   };

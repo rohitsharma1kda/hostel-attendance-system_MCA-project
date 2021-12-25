@@ -40,7 +40,7 @@ const Login = (props) => {
             required
           />
         </div>
-        <p className="errorMsg">{error}</p>
+        <p style={{marginTop: "13px", textAlign: "left"}} className="errorMsg">{error}</p>
         <div className="btnholder">
           <button onClick={handleLogin}>LOGIN </button>
         </div>
