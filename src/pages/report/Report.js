@@ -12,36 +12,46 @@ import ReactPaginate from "react-paginate"
 import "./paginate.css";
 
 const Report = () => {
-  const headers = [
+  const presentHeaders = [
+    { label: "Course", key: "course" },
     { label: "Branch", key: "branch" },
     { label: "Semester", key: "semester" },
     { label: "Name", key: "name" },
     { label: "Email", key: "email" },
     { label: "TimeStamp", key: "time" },
-    { label: "Image", key: "image" }
+    { label: "Image", key: "image" },
+    { label: "Hostel Block Name", key: "hostelBlockName" },
   ];
 
+  const absentHeaders = [
+    { label: "Course", key: "course" },
+    { label: "Branch", key: "branch" },
+    { label: "Semester", key: "semester" },
+    { label: "Name", key: "name" },
+    { label: "Email", key: "email" },
+    { label: "Hostel Block Name", key: "hostelBlockName" },
+  ];
   var date;
+  var indexStudent=0;
   var [inputDate, setInputDate] = useState("");
   const attendanceDocCollection = "hostel8/attendance";
   const [presentStudents, setPresentStudents] = useState([]); //Students present on a particular date
   const [users, setUsers] = useState([]); //Storing all clients in DB
   var storePresentStudents = []; //Storing variables along with the branch name in separate variable
 
-  // var storeAbsentStudents = [
-  //   {
-  //     name: "",
-  //     email: "",
-  //     time: "",
-  //     branch: "",
-  //     image: "",
-  //   },
-  // ];
+  var indexOfPresentStudents=[];
+  var storeAbsentStudents = [];
 
-  //Pagination
+  //PaginationPresent
+
   const [pageNumber, setPageNumber] = useState(0);
-  const usersPerPage = 2;
+  const usersPerPage = 5;
   const pagesVisited = pageNumber * usersPerPage;
+
+  //PaginationAbsent
+  const [pageNumberAbsent, setPageNumberAbsent] = useState(0);
+  const usersPerPageAbsent = 5;
+  const pagesVisitedAbsent = pageNumberAbsent * usersPerPageAbsent;
   
 
     
@@ -102,7 +112,7 @@ const Report = () => {
     return storePresentStudents.slice(pagesVisited, pagesVisited + usersPerPage).map((user)=>{
       return (
         <TableRow>
-        <StyledTableCell><img src={user.image} height="100px" width="100px" alt="studentImage"></img></StyledTableCell>
+        <StyledTableCell><img src={user.image} height="90px" width="90px" alt="studentImage"></img></StyledTableCell>
         <StyledTableCell>{user.branch}</StyledTableCell>
         <StyledTableCell>{user.semester}</StyledTableCell>
         <StyledTableCell>{user.name}</StyledTableCell>
@@ -113,11 +123,30 @@ const Report = () => {
     })
   }
 
+  const displayStoredAbsentStudents = () => {
+      return storeAbsentStudents.slice(pagesVisitedAbsent, pagesVisitedAbsent + usersPerPageAbsent).map((user)=>{
+      return (
+        <TableRow style={{height: "50px"}}>
+        <StyledTableCell>{user.name}</StyledTableCell>
+        <StyledTableCell>{user.branch}</StyledTableCell>
+        <StyledTableCell>{user.semester}</StyledTableCell>
+        <StyledTableCell>{user.email}</StyledTableCell>
+        </TableRow>
+      );
+    })
+  }
+
   const pageCount = Math.ceil(presentStudents.length/usersPerPage);
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
-  
+
+
+  const pageCountAbsent = Math.ceil((users.length-presentStudents.length)/usersPerPageAbsent);
+  const changePageAbsent = ({ selected }) => {
+    setPageNumberAbsent(selected);
+  };
+
   return (
     <div>
       <h3>Attendance Reports</h3>
@@ -157,8 +186,8 @@ const Report = () => {
             </div>
             <br />
             <h5 align="left">STUDENTS PRESENT</h5>
-            <Table stickyHeader="true" size="small">
-              <TableHead variant="head">
+            <Table size="small">
+              <TableHead>
                 <TableRow>
                 <StyledTableCell>Image</StyledTableCell>
                   <StyledTableCell>Branch</StyledTableCell>
@@ -177,7 +206,8 @@ const Report = () => {
                     time: tConv24(record.timeStamp),
                     image: record.imageUrl,
                     branch: "",
-                    semester: ""
+                    semester: "",
+                    course : ""
                   };
 
                   for (var i = 0; i < users.length; i++) {
@@ -185,6 +215,8 @@ const Report = () => {
                     if (user.email === record.email) {
                       newUser.branch = user.branch;
                       newUser.semester = user.semester;
+                      newUser.course = user.course;
+                      indexOfPresentStudents.push(i);
                       break;
                     }
                   }
@@ -216,30 +248,68 @@ const Report = () => {
               <ColorButtonCyan variant="contained" className="mt-2">
                 <CSVLink
                   style={{ color: "#f2f2f2" }}
-                  filename={inputDate + " attendance.csv"}
+                  filename={inputDate + " present.csv"}
                   data={storePresentStudents}
-                  headers={headers}
+                  headers={presentHeaders}
                 >
                   Download
                 </CSVLink>
               </ColorButtonCyan>
               <br />
               <br />
-              {/*Function for absent students */}
-              {}
-              {/* Table for Absent Students */}
+              {
+                // eslint-disable-next-line array-callback-return
+                users.map((user,index)=>{
+                  if(index === indexOfPresentStudents[indexStudent]){
+                    indexStudent++;
+                  }else
+                  {
+                    storeAbsentStudents.push(user)
+                  }
+                })
+              }
+
+            <h5 align="left">STUDENTS ABSENT</h5>
               <Table size="small">
-                <TableHead variant="head">
-                  <TableRow>
-                  <StyledTableCell>Image</StyledTableCell>
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Name</StyledTableCell>
                   <StyledTableCell>Branch</StyledTableCell>
                   <StyledTableCell>Semester</StyledTableCell>
-                  <StyledTableCell>Name</StyledTableCell>
                   <StyledTableCell>Email</StyledTableCell>
-                  <StyledTableCell>TimeStamp</StyledTableCell>
-                  </TableRow>
-                </TableHead>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+
+               {/* Absent Students */
+               displayStoredAbsentStudents()
+               }
+               
+              </TableBody>
               </Table>
+              <div className="react-paginate" align="center">
+              <ReactPaginate
+                previousLabel={"Previous"}
+                nextLabel={"Next"}
+                onPageChange={changePageAbsent}
+                pageCount={pageCountAbsent}
+                containerClassName={"paginationBttns"}
+                previousLinkClassName={"previousBttn"}
+                nextLinkClassName={"nextBttn"}
+                disabledClassName={"paginationDisabled"}
+                activeClassName={"paginationActive"}
+              />
+            </div>
+              <ColorButtonCyan variant="contained" className="mt-2">
+                <CSVLink
+                  style={{ color: "#f2f2f2" }}
+                  filename={inputDate + " absent.csv"}
+                  data={storeAbsentStudents}
+                  headers={absentHeaders}
+                >
+                  Download
+                </CSVLink>
+              </ColorButtonCyan>
             </div>
           </div>
         </>
