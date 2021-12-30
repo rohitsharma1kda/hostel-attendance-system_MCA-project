@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, query } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import { onSnapshot } from "firebase/firestore";
 import Table from "@material-ui/core/Table";
@@ -41,9 +41,9 @@ const Report = () => {
 
   var indexOfPresentStudents=[];
   var storeAbsentStudents = [];
+  const [loading, setLoading] = useState(false);
 
   //PaginationPresent
-
   const [pageNumber, setPageNumber] = useState(0);
   const usersPerPage = 5;
   const pagesVisited = pageNumber * usersPerPage;
@@ -56,7 +56,7 @@ const Report = () => {
 
     
   useEffect(() => {
-    onSnapshot(query(collection(db, "hostel8/users/clients")), (snapshot) =>
+    onSnapshot(query(collection(db, "hostel8/users/clients"), where("approved", "==", true)), (snapshot) =>
       setUsers(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
     );
   }, []);
@@ -73,6 +73,7 @@ const Report = () => {
   }
 
   const getAttendance = () => {
+    setLoading(true)
     var selectedDate = document
       .getElementById("datepicker")
       .value.toString()
@@ -106,6 +107,7 @@ const Report = () => {
         );
       }
     );
+    setLoading(false)
   };
 
   const displayStoredPresentStudents = () => {
@@ -316,7 +318,7 @@ const Report = () => {
       ) : (
         <h5>
           <br />
-          Attendance not available in database
+          {loading?"Attendance Loading...." : "Attendance not available in database"}
         </h5>
       )}
     </div>
